@@ -1,0 +1,46 @@
+Pull request do modulo ZX-81 - o que foi feito e proximos passos
+Data: 2026-11-03
+
+O pull request esta aberto:
+https://github.com/farique1/basic-dignified/pull/5
+
+- Destino: farique1/basic-dignified, branch main.
+- Origem: wilsonpilon/basic-dignified, branch suporte-zx81.
+- Commits: 6 (os 2 anteriores mais os 4 de hoje).
+- Estado: aberto para revisao (nao e rascunho) e sem conflitos com o main do Farique.
+
+Por que foi usado o GitHub CLI
+------------------------------
+A extensao do VS Code recusou a criacao com "must be a collaborator", porque
+ela nao consegue abrir PRs a partir de um fork. Por isso o PR foi aberto com o
+GitHub CLI (gh), que ja estava autenticado na conta wilsonpilon.
+
+O que diz a descricao do PR (em ingles, como a documentacao do projeto)
+-----------------------------------------------------------------------
+- O que o modulo ZX-81 inclui e os exemplos.
+- As alteracoes no nucleo, que sao so pontos de extensao opcionais, sem mudar
+  MSX e CoCo.
+- Os testes feitos e o que nao foi testado, como o helper Bash no Linux.
+- As tres decisoes deixadas para o autor:
+  1. A conversao sai com codigo 0 mesmo apos erro.
+  2. A variavel "program" falsa nos relatorios (-var) de todos os sistemas.
+  3. O exemplo do MSX (CGK173.dmx) usa argumentos que nao existem mais
+     (-of ta -el) no seu remtag.
+- Na parte de testes: os .p foram carregados no EightyOne durante o
+  desenvolvimento, e foi sugerido ao Farique rodar o mcode-ok.p, porque a
+  saida desse exemplo ainda nao foi confirmada.
+
+Proximos passos
+---------------
+- Acompanhe os comentarios na pagina do PR; o GitHub tambem avisa por e-mail.
+- Se o Farique pedir ajustes, basta fazer novos commits na branch
+  suporte-zx81 e envia-los com:
+      git push
+  O PR se atualiza automaticamente, sem precisar abrir outro.
+- Atencao: qualquer commit novo nessa branch entra no PR. Arquivos pessoais
+  (como este todo.txt e o resume.txt) estao no ignore local do Git
+  (.git/info/exclude) para nao irem por engano.
+- Se quiser responder em portugues, ele provavelmente vai entender, porque
+  tambem e brasileiro.
+- Pendencia sugerida: rodar examples/zx81/mcode-ok.p no EightyOne e conferir
+  se aparece "CALLING USR 16514: OK".

@@ -1,0 +1,506 @@
+Basic Dignified ZX Spectrum - branch/VSIX 1.10.0 (SEM NOVA RELEASE)
+Entrega concluida em 2026-11-05:
+- Commit 004abaaace40677595c80ffd0d87064f5600de76 publicado e confirmado
+  em origin/suporte-zx-spectrum e via API GitHub. Working tree limpa.
+- Push SSH falhou com erro remoto commit_refs_rules; publicacao HTTPS
+  autenticada pelo gh funcionou, sem force, alteracao de regras ou remotes.
+- Nenhum PR, tag/release ou integracao ZX81 criado. MSX/CoCo nao testados.
+- VSIX local (ignorado no Git) pronto para instalar manualmente no VS Code.
+  SHA256: DF42E425304AF303DB69A2A6B34B55CF4DEBB974B788AA9D6B59F7169E822392
+- A branch contem os fontes do pacote; nao foi publicado asset de release
+  nem enviado pacote a marketplace. Teste visual/instalacao pelo usuario.
+
+Preparacao da entrega branch/VSIX 1.10.0 (2026-11-05):
+- Pedido atual: gerar VSIX Spectrum para teste, publicar a branch
+  suporte-zx-spectrum no fork; NAO abrir PR, NAO integrar ZX81 e NAO
+  validar MSX/CoCo. Bug do launcher 128K permanece documentado.
+- Versao do modulo e VSIX atualizada para 1.10.0. Mesmo pacote para
+  48K/128K, separado dos pacotes das outras maquinas.
+- Adicionadas configuracao spectrum-basic.model (48/128), propagacao
+  nas tarefas de conversao/DignifieR e realce de PLAY/SPECTRUM.
+- Python Spectrum: 68 testes executados, 62 aprovados, 6 pulados por
+  ausencia do SkoolKit opcional. npm test aprovado para tarefas/gramaticas.
+- VSIX gerado: zxspectrum\VSCode Extension\basic-dignified-zxspectrum-1.10.0.vsix.
+  Integridade ZIP, manifesto/versao, fontes empacotadas e aviso do bug
+  conferidos; tarefas do proprio pacote executadas em 48K/128K para
+  conversao TAP/TZX e DignifieR. Instalacao GUI no VS Code nao executada;
+  usuario vai testar. VSIX e ignorado pelo Git, conforme convencao existente.
+- Os avisos historicos abaixo sobre VERSION=1.9.0 e falta de commit
+  descrevem o estado ANTERIOR; consultar o registro final da entrega.
+
+Atualizacao manual 2026-11-05 (prevalece sobre as pendencias antigas abaixo):
+- Usuario confirmou play128.tzx carregando/executando manualmente no
+  EightyOne e Spectaculator, com notas musicais e troca final para 48 BASIC.
+  SPECTRUM no fim da demo causa essa troca; LIST depois mostra os tokens
+  como UDG T/U, comportamento esperado, nao corrupcao.
+- --em_run 128K no EightyOne foi testado e FALHOU: boot, tela preta,
+  sem som nem resposta a BREAK; so reset libera. Causa nao isolada.
+  --tk_autorun -1 nao desliga o autoload/flash-load do emulador.
+- Usuario considerou os testes bem-sucedidos; relato detalhado confirma
+  o TZX 128K manual, nao cada caso 48K/snapshot/periferico da matriz.
+- Investigado Spectaculator 9.1 instalado: associacao local TZX usa
+  SpecStub.exe; manual oficial documenta File > Open e Auto load.
+  Nao foi estabelecida opcao CLI verificada de selecao 48K/128K.
+  Integracao completa via --em_run fica futura; nao passar Spectaculator
+  em --em_path, pois o launcher atual usa INI/argumentos do EightyOne.
+- Documentados geracao sem --em_run, carga manual e abertura via
+  associacao Windows em documentation/ZX_SPECTRUM.md; atualizados
+  INSTALLATION.md, IMPLEMENTATIONS.md e OUTLINE.md. Codigo inalterado
+  nesta rodada; sem bump, commit ou publicacao.
+
+Trabalho local sobre a base 1.9.0 (abaixo); nenhuma tag/release nova
+criada nesta rodada. VERSION do modulo permanece 1.9.0 de proposito
+(bump de versao/VSIX/Sublime fica para quando o usuario pedir publicacao).
+- Pedido do usuario: avancar so no modelo 128K do item 5 das pendencias
+  (sem perifericos/NextBASIC/turbo/multiarquivo); item 4 (destokenizacao)
+  continua fora de escopo. Item 2 (monitorar erros da ROM) foi investigado
+  e adiado a pedido explicito do usuario.
+- Investigacao do item 2: EightyOne nao tem nenhum gancho de automacao ou
+  depuracao externo (binario, changelog e busca na web conferidos); o
+  monitoramento do MSX via openMSX e exclusivo de Unix (nao se aplica no
+  Windows). A unica via viavel seria simulacao offline do SkoolKit
+  (Simulator), nao monitorar a janela real do EightyOne. Fica registrado
+  em OUTLINE.md como pendencia futura, nao implementado.
+- Implementado: `--sp_model 48|128` (default 48) e remtag `SP_MODEL`,
+  com precedencia INI<CLI<remtag igual ao resto do modulo. Tokens nativos
+  128K SPECTRUM (0xA3, sem argumentos) e PLAY (0xA4, 1 a 3 expressoes
+  separadas por virgula; conteudo da string nao e validado, so a ROM em
+  tempo de execucao). No 48K esses mesmos codigos sao os UDG %T/%U;
+  ficam bloqueados quando --sp_model 128, com mensagem explicita. Byte
+  bruto \{A3}/\{A4} continua aceito nos dois modelos (nunca certifica
+  semantica). SPECTRUM/PLAY ficam reservados como identificadores em
+  qualquer modelo (Description() nao tem acesso a stg; mesma limitacao
+  ja existente para CAT/FORMAT/MOVE/ERASE).
+- TAP/TZX binariamente identicos nos dois modelos (formato de fita nao
+  distingue maquina). Z80/SNA continuam exclusivos do 48K: `--sp_model 128`
+  com `--tk_format z80/sna/all` falha com erro explicito (formato 128K de
+  8 bancos e comportamento do SkoolKit com machine=128 nao verificados).
+- Novo perfil `zxspectrum/eightyone128.ini` (MachineName=Spectrum 128,
+  ROMSP128=spectrum128.rom), confirmado via o EightyOne.ini real do
+  usuario (%AppData%\EightyOne\EightyOne.ini) e extracao de strings do
+  binario (lista ordenada 16K/48K/48K+/Spectrum 128/+2/+2A/+3 == ordem
+  das chaves ROMSP16/ROMSP48/ROMSPP/ROMSP128/ROMSPP2/...). --em_run com
+  --sp_model 128 usa esse perfil automaticamente. NAO testado abrindo o
+  EightyOne de verdade (fica pendencia manual explicita no OUTLINE.md).
+- MAX_PROGRAM_BYTES mantido igual ao 48K nos dois modelos (conservador);
+  RAMTOP padrao do modo 128 BASIC nao foi confirmado para ampliar o limite.
+- Novo exemplo `examples/zxspectrum/play128.DZS/AZS/TAP/TZX`, gerado pelo
+  conversor real com --sp_model 128 (CLS/PRINT/PLAY/SPECTRUM); round-trip
+  AZS->tokenize(model=128) conferido como identico ao TAP. Validacao manual
+  no EightyOne pendente (mesmo tratamento dos demos anteriores).
+- Corrigido apos revisao da documentacao: o Spectrum DignifieR
+  (`python -m zxspectrum.dignifier`) chamava tokenize() e a validacao via
+  subprocess sempre com o modelo 48K por padrao, entao rejeitava fontes
+  classicas 128K (SPECTRUM/PLAY) mesmo quando deveriam ser aceitas. Ganhou
+  seu proprio `--sp_model 48|128`, repassado para dignify() e para a
+  validacao real via subprocess.
+- 68 testes Python aprovados (61 antigos inalterados + 7 novos, incluindo
+  o teste do DignifieR acima), seis pulados por falta do SkoolKit opcional
+  (sem mudanca nesta rodada). Gramatica do codigo novo conferida em modo
+  Python 3.8 via ast.parse.
+- Documentacao atualizada nesta rodada: documentation/ZX_SPECTRUM.md (nova
+  secao "128K model", tabela de CLI/remtags, secao EightyOne, pendencias
+  e checklist de verificacao manual), documentation/DIGNIFIER.md (flag
+  --sp_model), documentation/INSTALLATION.md (EightyOne 48K/128K),
+  documentation/IMPLEMENTATIONS.md (changelog nao publicado + To Do),
+  README.md (tabela de modulos e paragrafo Spectrum) e OUTLINE.md
+  (progresso, tabela de pendencias, checklist manual). Nenhuma linha
+  original removida em nenhum desses arquivos.
+
+Proximos passos sugeridos: investigar congelamento do launcher 128K no
+EightyOne (TZX manual aprovado); decidir se/quando bump de versao e republicacao;
+revisitar item 2 (monitor de erros) via SkoolKit se/quando desejado.
+
+IMPORTANTE PARA CONTINUAR EM OUTRA MAQUINA:
+- Todo o trabalho acima (128K + correcao do DignifieR) esta APENAS no
+  working tree local; nenhum commit foi feito (usuario nao pediu). Um
+  `git clone`/`pull` noutra maquina NAO vai trazer essas mudancas.
+  `git status --porcelain` nesta maquina mostra modificados:
+  OUTLINE.md, README.md, documentation/DIGNIFIER.md,
+  documentation/IMPLEMENTATIONS.md, documentation/INSTALLATION.md,
+  documentation/ZX_SPECTRUM.md, zxspectrum/badig_zxspectrum.py,
+  zxspectrum/dignifier.py, zxspectrum/emulator_interface.py,
+  zxspectrum/test_zxspectrum.py, zxspectrum/tokenizer_interface.py,
+  zxspectrum/tokenizer_zxspectrum.py; e novos (untracked):
+  examples/zxspectrum/play128.{DZS,AZS,tap,tzx}, zxspectrum/eightyone128.ini.
+- resume.txt (este arquivo) e todo.txt estao em .git/info/exclude: isso e
+  LOCAL a este .git desta maquina. O arquivo nunca foi commitado e nunca
+  vai aparecer num clone/pull noutra maquina, mesmo depois de commitar o
+  resto. Para continuar noutra maquina, o usuario precisa copiar este
+  resume.txt manualmente (ou colar o conteudo) alem de levar o codigo.
+- Antes de trocar de maquina, pedir ao usuario para decidir: (a) commitar
+  este trabalho agora (branch suporte-zx-spectrum) para poder puxar na
+  outra maquina, e/ou (b) copiar a working tree inteira por outro meio.
+  Nao foi commitado nem perguntado isso ainda nesta sessao.
+
+======================================================================
+Registro historico anterior (entrega 1.9.0 publicada) abaixo
+======================================================================
+
+Basic Dignified ZX Spectrum - v1.9.0 preview / continuidade
+Codigo, documentacao e previa 1.9.0 publicados e verificados.
+Suite original permanece 2.2.1.
+- Commit 767fc1b9ebc9f383bc10e2de8b8fdd7cf4d03a38; branch
+  suporte-zx-spectrum e tag anotada spectrum-v1.9.0 sincronizados.
+- Release https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.9.0
+  Previa, latest=false, 43 assets. SHA-256 local/API/download iguais.
+  ZIP fonte aponta para o commit; fonte extraido passa ambas as suites.
+  Oito demos e seis snapshots fornecidos reproduzidos byte a byte.
+  Main e nove tags Spectrum anteriores inalterados; worktree limpo.
+- Itens anteriores 2, 3 e 5 implementados: DEF FN/FN nativo,
+  LOAD/SAVE/VERIFY/MERGE e streams/printer; DignifieR AZS -> DZS.
+- Bytes literais \{00}..\{FF} em codigo, strings, REM e REMX.
+  Insercao bruta nao certifica sintaxe BASIC nem acrescenta caches.
+- 61 testes aprovados com SkoolKit 10.1; sem motor, seis skips.
+  ROM confirmou FN numerico/string/zero/aninhado, x global intacto,
+  bytes 0/255 e stream S nos dois snapshots.
+- DignifieR preserva strings, REM, IF com : e numeracao regular,
+  gera labels para destinos estaticos e rejeita destinos inseguros.
+  CLI verifica a compilacao real; --force requerido para substituir.
+- Documentacao original integrada e preservada, inclusive opcoes MSX.
+  Gramatica Python 3.8 verificada (nao certificacao runtime 3.8).
+  JSON, links, gramaticas TextMate/Sublime e pacote VSIX conferidos.
+- Seis demos antigas e tapes identicos a 1.8.0.
+  MSX/CoCo: vetores de 53 bytes identicos a main.
+  LIST com stream, separador comma ou semicolon, executado na ROM.
+- CLI DignifieR fn/streams reproduz tapes identicos; graphics tem
+  numeracao irregular e e renumerado como documentado, sem mudar bodies.
+- Pylance nos novos helpers/tokenizer sem novos erros; diagnosticos
+  dinamicos Info.log/mixin join_commands do dialeto existem na base.
+- Novas demos fn e streams; tapes/printer do demo seguem STOP,
+  nao sao executados automaticamente.
+Resumo das pendencias, por necessidade e custo
+-------------------------------------------
+1. Validar manualmente EightyOne: native/graphics TAP/TZX com/sem autorun,
+   hello/graphics Z80/SNA com/sem autorun; registrar perfil e resultados.
+   Necessidade alta, custo baixo. Os 16 OK antigos nao cobrem esses casos.
+2. Validar manualmente native FN e LOAD/SAVE/VERIFY/MERGE/printer;
+   fontes/formas tokenizadas cobertas, midia real e hardware pendentes.
+3. Monitorar erros reais da ROM e mapear para DZS. Media, custo alto.
+4. VSIX/instalacao realmente integrados, na etapa final conforme decidido;
+   Python/conversor ainda externos, SkoolKit opcional. Medio/alto.
+5. Extrair/destokenizar binarios; DignifieR atual le apenas ASCII numerado,
+   sem reconstruir macros e aliases originais. Media, custo alto.
+6. 128K/perifericos/NextBASIC/turbo/multiarquivos: escopo futuro opcional.
+Aliases automaticos, compostos em arrays e recursao local nao sao promessas.
+Detalhes e checklist em OUTLINE.md, sem apagar o plano/historico original.
+Registro historico da revisao documental 1.8.0 abaixo
+---------------------------------------------------
+Esta revisao atualiza somente documentacao; nao implementa novas funcoes
+nem altera tags/assets publicados. Resultados de testes abaixo sao os da
+entrega 1.8.0, nao novas execucoes desta revisao documental.
+Revisao documental sincronizada no fork: commit
+b5ad1d6b490bded76de743ca99e6cf65bccc3515, branch suporte-zx-spectrum.
+Links/anchors novos e exemplos conferidos; uso/opcoes do DignifieR MSX
+inalterados. Main, todas as tags Spectrum e os 32 assets permanecem iguais.
+Worktree limpo; resume.txt continua apenas local e ignorado.
+
+Atualizacao 1.8.0 (publicado e verificado)
+------------------------------------------------------------
+- Escapes ativos \80..\A4, %A..%U, \\ e %%; bytes \{XX} somente REM.
+  Tabela completa dos blocos/UDG, teclado e POKE USR para bitmap no manual.
+- REMX absoluto, fill padrao caractere '0', decimal 0..255 ou um caractere
+  decodificado; includes/toggles, relatorios, ordenacao e colisoes cobertos.
+  Byte 13 e aceito e comprovado na ROM. Record max 65535, n max 65532;
+  limites TAP/memoria nao mudam.
+- Manuais integrados, sem addenda Spectrum artificiais; secoes/exemplos
+  MSX/CoCo de 12 documentos originais preservados. Links internos relativos.
+  DignifieR continua MSX, -asc Spectrum apenas entrada ja numerada.
+- 54 testes com SkoolKit 10.1 aprovados; base 54 com 5 skips explicitos.
+  ROM executou os dois snapshots, verificando REM raw13, UDG e pixels.
+  Cinco demos antigas preservadas; MSX/CoCo 53 bytes identicos a 4283702.
+- Pylance implementacao sem diagnosticos, cinco chamadas encode_text
+  compativeis; testes sinalizam so imports SkoolKit opcionais no Python base.
+  Gramatica Python 3.8, JSON, TextMate e VSIX real verificados.
+- Demo graphics em DZS/AZS/TAP/TZX/Z80/SNA, sem autorun.
+  Editores 1.8.0 com REMX/escapes/UDG; Sublime Classic AZS via -asc.
+- ZIP extraido: suites sem/com motor aprovadas e seis demos reproduzidas,
+  incluindo hello/graphics Z80/SNA byte a byte. ZIP referencia o commit correto.
+- Commit 4c66d4a07564018ee92411747e3dd96f1fe07636; tag anotada
+  spectrum-v1.8.0 e suporte-zx-spectrum sincronizados atomicamente no fork.
+  Release https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.8.0
+  Previa, latest=false, 32 assets baixados e SHA local/API/download iguais.
+  Main e oito tags anteriores inalterados; worktree limpo.
+- Temporarios proprios da 1.8 removidos apos todas as validacoes.
+- Manual EightyOne graphics/native e snapshots ainda pendente.
+
+Registro historico 1.7.0 abaixo (nao e o estado corrente)
+-------------------------------------------------------
+Basic Dignified ZX Spectrum - v1.7.0 preview / continuidade
+Atualizacao 1.7.0 (publicado e verificado)
+--------------------------------------
+- Usuario confirmou DZS/AZS como padrao, DSP/ASP compativeis, snapshots
+  nesta entrega, SkoolKit opcional documentado e task explicita de instalacao.
+  VSIX realmente integrado fica para etapa final; nao inclui conversor/Python agora.
+- DZS Dignified -> AZS texto numerado -> TAP/TZX ou Z80 v3/SNA 48K reais.
+  --tk_format both continua TAP/TZX; all gera os quatro; z80/sna geram apenas um.
+- Worker local com mesmo sys.executable, diretorio temporario e nomes fixos
+  para evitar interpretacao de caminho Windows como URL pelo SkoolKit.
+  Engine >=8.10,<11 instalado apenas em venvs isolados da sessao, nunca global.
+  8.10 precisa --sim-load; >=9 simula por padrao e aceita machine=48.
+  API get_snapshot comum; nosso leitor de registradores v3 evita depender
+  da classe Snapshot ausente em 8.10. SNA salva PC em SP-2.
+- Valida PC 0x1B76 apos LOAD e antes de executar BASIC, PROG/VARS,
+  programa exato, terminador 128 e espaco da pilha. Timeout/status 0
+  sem carga valida e rejeitado. Falha de geracao preserva todos os binarios
+  existentes; substituicao atomica por arquivo, nao transacao multi-arquivo.
+- Exemplos DZS/AZS migrados; TAP/TZX e texto preservados; hello.z80/sna
+  sem autorun inclusos como amostras. Editores mantem aliases DSP/ASP.
+  Launcher desliga flags de fita em snapshots.
+- 49 testes aprovados com SkoolKit 10.1. SkoolKit 8.10 tambem validado;
+  sonda de retomada usa API recente e e explicitamente pulada em 8.10.
+  Sem motor, integracoes sao explicitamente puladas; TAP/TZX seguem stdlib.
+- ROM retomou POKE 30000,123 nos dois snapshots; nao executa com autorun
+  desligado. LIST/RUN dos snapshots no EightyOne ainda pendente manualmente.
+- Cinco demos antigas: fontes/texto identicos e TAP/TZX byte a byte.
+  MSX/CoCo vetores 38 bytes iguais a base; CoCo completo com -rh -ca:
+  1230 bytes iguais a base. Original de Farique preservado nos sete manuais.
+- Pylance: apenas reportMissingImports do SkoolKit opcional no interpretador
+  base selecionado; sem novos diagnosticos estruturais nos arquivos verificados.
+- ZIP extraido: 49 testes sem motor (4 pulados explicitamente), 49 com motor,
+  cinco demos reproduzidas e hello Z80/SNA identicos byte a byte; sem ROM
+  embutida. VSIX real inspecionado: tarefas JSON e aliases corretos.
+- Commit: a1d325577234b64939e7174d2e2aa79579b85525.
+  Branch suporte-zx-spectrum e tag anotada spectrum-v1.7.0 sincronizados.
+  Release: https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.7.0
+  26 assets uploaded; baixados novamente e SHA-256 iguais aos locais e API.
+  ZIP aponta para o commit correto. Main e sete tags anteriores inalterados.
+  Worktree limpo; este resume.txt permanece ignorado.
+- Proximos: usuario validar LIST/RUN dos snapshots no EightyOne e demo
+  native; depois DEF FN/FN e demais comandos conforme prioridade.
+  VSIX realmente integrado e instalacao simplificada continuam etapa final.
+
+Registro historico da entrega 1.6.0 abaixo (nao e o estado corrente)
+-----------------------------------------------------------------
+Basic Dignified ZX Spectrum - v1.6.0 preview / continuidade
+Atualizado: 2026-11-04
+Branch atual: suporte-zx-spectrum
+Base analisada: 4283702 (main / suite anunciada como v2.2.1)
+
+Pedido atual
+------------
+Usuario aprovou 1.6.0 com testes de :, RUN/LIST/NEW/CONTINUE/OUT e BIN.
+DEF FN/FN fica para entrega propria, nao implementar neste escopo.
+Versao propria do modulo: 1.6.0; preservar suite original 2.2.1.
+Publicar previa em wilsonpilon/basic-dignified, branch suporte-zx-spectrum.
+Nao alterar main, upstream nem o PR ZX81.
+Documentacao original do Farique preservada; apenas adicoes Spectrum.
+
+O que foi feito
+---------------
+- Modulo zxspectrum: .DSP -> .ASP -> .tap/.tzx, sem novas dependencias Python.
+- 1.2: TZX 1.20 padrao, cores, som, INPUT, GO SUB/RETURN, FOR/NEXT.
+- 1.3: strings, arrays, slices, DATA/READ/RESTORE, funcoes nativas.
+- 1.4: LET implicito, compostos escalares com precedencia preservada,
+  ? / [?](linha,coluna), FUNC/RET e graficos basicos.
+- 1.5: --tk_autorun (-1 desliga, 0..9999 linha inicial);
+  --em_run --em_path com perfil 48K temporario, aguarda fechamento.
+  Remtags e INIs obedecem precedencia INI < CLI < remtags.
+- 1.5.1: ERROR_EXIT_CODE opcional no modulo de linguagem controla os
+  fatais do Infolog compartilhado, inclusive instancias pre-existentes.
+  Spectrum usa 1; MSX/CoCo preservam 0. Politica reinicializada por selecao.
+  Erros capturados no INI principal sao reportados depois da selecao.
+  Ajuda, versao, remtags de ajuda e escrita bem-sucedida de INI retornam 0.
+- 1.6.0: RUN/LIST/NEW/CONTINUE/OUT, aridade/separadores/parenteses/contexto.
+  RUN/LIST aceitam labels. Expressoes/tipos/faixas de execucao ficam na ROM.
+  BIN usa token C4 e cache 0E + cinco bytes do valor BINARIO 0..65535.
+  Aceita zeros iniciais extras e espacos entre bits; tabs viram espacos.
+  Rejeita digitos invalidos, literal vazio, ponto/expoente e overflow.
+  BIN e prefixo literal; para negativo usar -BIN 10, nao BIN -10.
+- Testes permanentes para :, IF/THEN, strings/REM, LET/compostos, erros
+  apos separadores e normalizacao de :: apenas no fluxo Dignified.
+- Nova demo native em DSP/ASP/TAP/TZX com LIST/RUN para label e PAUSE 0:
+  esperado BIN 7, CHAIN OK, A:B e PRESS A KEY TO LIST; uma tecla lista
+  o final, depois PRESS A KEY TO RUN; outra tecla executa RUN,
+  limpa tela/variaveis e imprime DONE. Borda azul via OUT.
+  Execucao manual EightyOne desta demo ainda PENDENTE.
+- VS Code/VSIX e Sublime atualizados para 1.6.0; testes TextMate aprovados.
+- Escalares numericos longos nativos; strings/arrays/FOR usam letras
+  ou DECLARE explicito. Sem alocacao contextual automatica.
+- Header/data TAP e TZX com numeros Sinclair e checksums XOR.
+  Cada fita e substituida atomicamente; o par nao e transacional.
+- Apenas dois hooks opcionais no nucleo: quoted_string e postprocess,
+  compativeis com os hooks correspondentes do branch ZX81, sem merge.
+- Exemplos hello, colours, data, functions e native em DSP/ASP/TAP/TZX.
+- Fonte/VSIX VS Code com testes reais TextMate/Oniguruma e templates Sublime.
+  Dependencias npm sao apenas de desenvolvimento do pacote de editor.
+- Manual documentation/ZX_SPECTRUM.md e secoes aditivas no README,
+  INSTALLATION, BASIC_DIGNIFIED, MODULE_TOOLS, NEW_MODULES, IDE_TOOLS,
+  examples/README. OUTLINE.md atualizado ate 1.6 e com pendencias explicitas.
+
+Verificacao
+-----------
+- python -B -m unittest zxspectrum.test_zxspectrum -v
+  41 testes aprovados: bytes/numeros/BIN, comandos/contexto, CLI/remtags, variaveis/dados,
+  macros/includes, labels, strings, precedencia, funcoes, autorun, launcher,
+  falhas/status nao-zero/interrupcao e preservacao de arquivos/perfil.
+- Reproduzidos antes da correcao: labels/macros/lexer/INCLUDE, fonte ausente
+  e remtags/INI invalidos saiam com 0. Agora saem com 1 no Spectrum,
+  inclusive em -vb 0. Ajuda/escrita de INI e erros legados preservados.
+  Testada troca Spectrum -> MSX/CoCo no mesmo processo, sem vazar politica.
+- npm test e npm run package no fonte da extensao: aprovados.
+- VSIX conferido; ZIP da suite extraido, 41 testes aprovados e cinco
+  exemplos reproduzidos: ASP identico como texto, TAP/TZX byte a byte,
+  sem instalar dependencias npm/Python. Git/plataforma normalizam finais de linha.
+- Gramatica do novo codigo analisada com AST em modo Python 3.8.
+- Conversoes pequenas MSX/CoCo identicas a base 4283702:
+  vetor anterior de 75 bytes e vetor de 38 bytes revalidado na 1.5.1.
+- Exemplo CoCo completo identico a base: 1319 bytes.
+- Exemplo MSX original tem remtags obsoletas; nao contado como aprovado.
+- Todas as linhas originais dos sete documentos editados preservadas,
+  na mesma ordem, verificadas contra a base.
+- Usuario confirmou manualmente carga, LIST e RUN do hello.tap com saida
+  SPECTRUM 1, SPECTRUM 2, SPECTRUM 3 e DONE.
+- Em 2026-11-04 confirmou "Todos foram OK" para os 16 casos do roteiro:
+  hello/colours/data/functions x TAP/TZX x manual/autorun.
+  Validacao manual reportada pelo usuario, nao automacao de execucao ROM.
+- Launcher real da 1.5 testado com EightyOne 1.41 instalado: janela
+  responsiva, hello.TAP reconhecido, fechamento normal, perfil original
+  preservado e INI temporario removido. Isso NAO comprova saida emulada.
+- Processos de teste encerrados; copias de executavel/ROMs removidas.
+
+Pontos importantes para retomar
+------------------------------
+- Validacao manual das demos concluida: 16/16 OK.
+- Retorno de erro consistente, comandos basicos extras e BIN concluidos.
+  Proxima prioridade: manual native; depois DEF FN/FN em entrega propria.
+- DEF FN/FN, streams, comandos de fita dentro do BASIC e demais
+  keywords ainda nao disponiveis. Graficos/UDG escapes pendentes.
+- Sem monitoramento automatico de erros na ROM; launcher nao e certificacao.
+- Compostos em arrays/slices sao rejeitados para nao reavaliar indices.
+- FUNC/RET usa parametros/resultados globais, sem frames locais recursivos.
+- Nao prometer todo Sinclair BASIC: esta e uma previa de subconjunto.
+- Infolog comum usa a politica do dialeto: Spectrum 1, legado MSX/CoCo 0.
+- Limite comum de 256 caracteres por linha preservado.
+- Conversor sem dependencias novas; nao distribuir ROMs do emulador.
+- Historico ZX81 abaixo e de outro branch e nao foi revalidado remotamente.
+
+Marcos publicados
+-----------------
+1.2.0: c93814c0cb973a082847e40472c25977a5b08b04
+1.3.0: 7fbb85f9af266b0603846a1cecafffbcd2d899f2
+1.4.0: c83bfb8d3af1d1d9b3351644cbd00c463964cce5
+1.5.0: 0c1bb7b897bcaa54d150b8b60c3990ff4bece1b1
+1.5.1: f64f0156bf534c6d04200f312e20afc325c07ba2
+1.6.0: c3e6a5a598170a7b3eaa621a6aa937349a6f37d5
+Consultar OUTLINE.md e documentation/ZX_SPECTRUM.md para os detalhes.
+
+Persistencia
+------------
+OUTLINE.md nao esta excluido pelo Git.
+resume.txt e todo.txt estao em .git/info/exclude: existem localmente,
+mas nao serao incluidos automaticamente em commits.
+Tag spectrum-v1.5.0 aponta para o commit 1.5 acima, mantida imutavel.
+Branch Spectrum recebe tambem o registro documental dos 16 testes manuais.
+Pre-releases 1.2/1.3/1.4/1.5 publicadas e verificadas no fork, sem alterar main:
+https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.5.0
+32 assets conferidos via SHA-256 entre as quatro novas releases.
+1.5 tem ZIP da suite, VSIX, ZIP Sublime, manual e 16 arquivos de exemplos.
+1.5.1 publicada e branch/tag sincronizados:
+https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.5.1
+20 ativos verificados por SHA-256 na API e por download novo de todos eles.
+ZIP extraido: 35 testes aprovados sem instalar dependencias; quatro demos
+reproduzidas byte a byte em ASP/TAP/TZX (hello usa -ca; demais sem -ca).
+VSIX/Sublime continuam em 1.5.0, identicos aos ativos anteriormente publicados.
+Cinco tags dos marcos anteriores verificadas remotamente, sem alteracoes.
+1.6.0 publicada e branch/tag sincronizados:
+https://github.com/wilsonpilon/basic-dignified/releases/tag/spectrum-v1.6.0
+24 ativos verificados por SHA-256 na API e por download novo de todos eles.
+ZIP fonte registra o mesmo commit da tag; VSIX e Sublime agora em 1.6.0.
+Seis tags anteriores preservadas. Nenhuma alteracao em main/upstream/ZX81.
+Nova demo tem duas pausas para inspecionar BIN/OUT, LIST e RUN.
+Nao declarar validacao emulada da 1.6.0: manual native ainda pendente;
+os 16 OK reportados pelo usuario cobrem somente as quatro demos anteriores.
+Tags locais sincronizadas; worktree limpo. resume.txt continua local/ignorado.
+
+======================================================================
+HISTORICO ZX81 - notas anteriores, mantidas como referencia
+O estado abaixo e de 2026-11-03; nao representa o branch Spectrum atual.
+======================================================================
+
+Basic Dignified ZX-81 module - handoff
+Updated: 2026-11-03
+Branch: suporte-zx81 (pushed to origin = wilsonpilon/basic-dignified)
+Pull request: https://github.com/farique1/basic-dignified/pull/5 (open, mergeable)
+
+This file and todo.txt are personal notes. They are listed in .git/info/exclude
+so they are not committed: any new commit on suporte-zx81 goes into the PR.
+
+State
+-----
+The PR to farique1/basic-dignified:main is open with 6 commits:
+- a5563f7 Add ZX-81 module and editor integration
+- bde32a3 Update ZX-81 handoff status
+- 6bf2955 ZX-81: renumber numbered listings, add remx and ZX81 DignifieR
+- b42f778 ZX-81 editors: highlight \{XX} and remx, add remx snippet, rebuild VSIX
+- 2755ffb ZX-81 examples: add intro and machine code demo, ignore local samples
+- a9e43a5 Document the ZX-81 module, DignifieR, remx and examples; remove handoff notes
+The PR was opened with the GitHub CLI (gh); the VS Code extension cannot open
+PRs from a fork ("must be a collaborator").
+
+Remotes: origin = wilsonpilon/basic-dignified (fork), upstream = farique1/basic-dignified.
+
+Module layout
+-------------
+- badig.py, support/badig_settings.py: only optional hooks, used only by ZX-81
+  (classic quoted-string hook, preprocess/postprocess, numbered-listing flag).
+- zx81/badig_zx81.py: language description, lexer/parser hooks, numbered
+  listing renumbering, remx expansion, implicit LET.
+- zx81/tokenizer_zx81.py: .AZX -> .p in pure Python (tokens, 5-byte floats,
+  graphics/inverse escapes, \{XX} bytes, remx, 64 KB program limit).
+- zx81/zx81bader.py: ZX81 Basic DignifieR (classic -> Dignified).
+- zx81/tokenizer_interface.py, tools_zx81.py, emulator_interface.py: tool
+  integration; EightyOne default path C:\zeddy\EightyOne.exe.
+- zx81/convert-zx81.ps1, convert-zx81.sh: conversion helpers.
+- zx81/VSCode Extension/ (VSIX + .vscode/tasks.json template) and
+  zx81/Sublime Package/BasicDignifiedZX81/.
+- zx81/test_tokenizer_zx81.py: 34 tests.
+- examples/zx81/: zx81-intro and mcode-ok (.DZX, .AZX, .p).
+- zx81/samples/ is git-ignored (local test area); it was emptied.
+
+Features
+--------
+- -id zx81: .DZX -> numbered .AZX -> .p; --em_run opens EightyOne.
+- Long variable names -> 26 letters from Z down; declare supported.
+- [?](row,column) -> PRINT AT; LET inserted for assignments.
+- \{XX} literal byte escapes in code, strings and REM; number followed
+  immediately by \{7E} keeps explicit hidden bytes (Go81 p2txt listings).
+- Numbered .DZX listings are renumbered (jump targets become labels);
+  -ls/-lp from command line, ##BB:arguments= remtag or support/badig.ini.
+  Computed jumps (GOTO 10*X) stop the conversion; use -asc to keep numbers.
+- remx <line>,<count>[,<byte>]: machine code REM line, default fill "0";
+  first byte at 16514 when it is the first line. Program area max 48231 bytes.
+- Reports -lnr, -var, -lbr, -lex, -par work; -lbr output is read-only on ZX-81.
+- ZX81 Basic DignifieR options: -tl, -ks, -cp, -fl, -fr, -ut, -rv, -vb.
+
+Verification
+------------
+- python -B -m unittest zx81.test_tokenizer_zx81
+- Rebuild VSIX after editor changes:
+    cd "zx81/VSCode Extension"; npx --yes @vscode/vsce package --no-dependencies --skip-license
+- Documentation check: every original line of Farique's docs must remain, in
+  order (upstream main 4283702). Only add separate ZX-81 sections.
+
+VS Code setup notes
+-------------------
+- The VSIX is installed in VS Code Insiders; zx81-basic-dignified.badigPath is
+  set in both Code and Code - Insiders user settings to
+  C:/dos/basic-dignified/badig.py.
+- Copy zx81/VSCode Extension/.vscode into the project folder to get the builds.
+
+Open points (left to the author, listed in the PR)
+--------------------------------------------------
+1. Shared logger exits with status 0 after errors.
+2. Phantom "program" variable in -var reports on every system (worked around
+   for ZX-81 only).
+3. examples/msx/CGK173.dmx remtag uses removed options (-of ta -el).
+
+Still to test
+-------------
+- Run examples/zx81/mcode-ok.p in EightyOne; expected:
+    LOADING MACHINE CODE...
+    CALLING USR 16514: OK
+- Bash helper on Linux/macOS (case-sensitive .DZX suffix).
+
+If the author asks for changes: commit on suporte-zx81 and git push; the PR
+updates automatically.

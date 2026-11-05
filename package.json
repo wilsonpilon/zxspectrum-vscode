@@ -1,0 +1,185 @@
+{
+  "name": "zxspectrum-basic",
+  "version": "1.11.1",
+  "publisher": "WilsonPilon",
+  "author": "Wilson Pilon",
+  "displayName": "ZX Spectrum Basic",
+  "description": "ZX Spectrum (Sinclair BASIC) language support, snippets and build tasks for Basic Dignified",
+  "homepage": "https://github.com/wilsonpilon/basic-dignified/tree/suporte-zxspectrum",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wilsonpilon/basic-dignified.git"
+  },
+  "engines": {
+    "vscode": "^1.145.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "basic",
+    "dignified",
+    "sinclair",
+    "zx spectrum",
+    "spectrum",
+    "zxspectrum",
+    "syntax",
+    "build"
+  ],
+  "files": [
+    ".vscode/tasks.json",
+    "README.md",
+    "LICENSE",
+    "icon.png",
+    "config/**",
+    "snippets/**",
+    "syntaxes/**",
+    "tools/**"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "spectrum-classic",
+        "aliases": ["Sinclair BASIC", "ZX Spectrum BASIC"],
+        "extensions": [".AZS", ".azs", ".ASP", ".asp"],
+        "configuration": "./config/language-configuration.json"
+      },
+      {
+        "id": "spectrum-dignified",
+        "aliases": ["ZX Spectrum Basic Dignified", "Spectrum Dignified"],
+        "extensions": [".DZS", ".dzs", ".DSP", ".dsp"],
+        "configuration": "./config/language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "spectrum-classic",
+        "scopeName": "source.basic.spectrum.classic",
+        "path": "./syntaxes/classic.tmLanguage.json"
+      },
+      {
+        "language": "spectrum-dignified",
+        "scopeName": "source.basic.spectrum",
+        "path": "./syntaxes/spectrum.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "spectrum-dignified",
+        "path": "./snippets/spectrum.json"
+      }
+    ],
+    "commands": [
+      {
+        "category": "Dignified: ZX Spectrum",
+        "command": "workbench.action.tasks.build",
+        "title": "Build or run Dignified: ZX Spectrum"
+      },
+      {
+        "category": "Classic: ZX Spectrum",
+        "command": "workbench.action.tasks.test",
+        "title": "Run classic: ZX Spectrum"
+      },
+      {
+        "category": "ZX Spectrum",
+        "command": "workbench.action.tasks.runTask",
+        "title": "Run ZX Spectrum task"
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "spectrumDignifiedProblem",
+        "owner": "basic-dignified",
+        "fileLocation": ["relative", "${fileDirname}"],
+        "pattern": {
+          "regexp": "^\\*\\*\\*\\s(.*):\\s\\((\\d+),(\\d+)\\):\\s(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4
+        }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "workbench.action.tasks.runTask",
+          "when": "resourceLangId == spectrum-dignified || resourceLangId == spectrum-classic"
+        }
+      ],
+      "editor/title/run": [
+        {
+          "command": "workbench.action.tasks.build",
+          "group": "navigation@0",
+          "when": "resourceLangId == spectrum-dignified"
+        },
+        {
+          "command": "workbench.action.tasks.test",
+          "group": "navigation@0",
+          "when": "resourceLangId == spectrum-classic"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "workbench.action.tasks.build",
+        "key": "ctrl+shift+b",
+        "when": "editorTextFocus && resourceLangId == spectrum-dignified"
+      },
+      {
+        "command": "workbench.action.tasks.test",
+        "key": "ctrl+shift+alt+b",
+        "when": "editorTextFocus && resourceLangId == spectrum-classic"
+      }
+    ],
+    "configuration": {
+      "title": "Basic Dignified: ZX Spectrum",
+      "properties": {
+        "spectrum-basic.badigPath": {
+          "type": "string",
+          "order": 0,
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Path to a custom Basic Dignified `badig.py` file. Leave empty to use the bundled ZX Spectrum version."
+        },
+        "spectrum-basic.python": {
+          "type": "string",
+          "order": 1,
+          "default": "python",
+          "scope": "machine",
+          "markdownDescription": "Python 3.8+ executable, such as `python` or `python3`."
+        },
+        "spectrum-basic.model": {
+          "type": "string",
+          "order": 2,
+          "enum": ["48", "128"],
+          "enumDescriptions": [
+            "ZX Spectrum 48K (required for snapshots).",
+            "ZX Spectrum 128K (tape only; load manually in EightyOne)."
+          ],
+          "default": "48",
+          "scope": "machine",
+          "markdownDescription": "Spectrum ROM model for build and DignifieR tasks. Snapshots require `48`. EightyOne automatic 128K loading has a known freeze; load 128K tapes manually."
+        },
+        "spectrum-basic.emulatorPath": {
+          "type": "string",
+          "order": 3,
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Absolute path to `EightyOne.exe` on Windows."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node test-grammar.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.0",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.3.2"
+  }
+}
